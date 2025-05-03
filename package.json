@@ -13,7 +13,7 @@
     "aeony-clean": "rimraf ./dist",
     "aeony-build": "tstl -p tsconfig.build.json",
     "build": "run-s aeony-clean aeony-build",
-    "prettier": "prettier --check ./tests ./src",
+    "prettier": "prettier --check ./tests/**/*.ts ./src/**/*.ts",
     "lint": "eslint ./tests ./src",
     "clean-tests": "rimraf ./tests_out",
     "build-tests": "pnpm clean-tests && tstl -p tsconfig.test.json",
