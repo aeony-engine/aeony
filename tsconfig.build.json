@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "love-typescript-definitions",
+      "@typescript-to-lua/language-extensions",
+      "lua-types/jit"
+    ],
+    "rootDir": "src",
+    "strict": true,
+  },
+  "include": ["src"],
+}

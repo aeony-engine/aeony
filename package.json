@@ -1,0 +1,43 @@
+{
+  "name": "@aeony/aeony",
+  "version": "0.1.0",
+  "description": "TypeScript game engine on top of Love2D",
+  "files": [
+    "dist/**/*.lua",
+    "dist/**/*.d.ts"
+  ],
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index",
+  "scripts": {
+    "prepare": "tstl -p tsconfig.build.json",
+    "aeony-clean": "rimraf ./dist",
+    "aeony-build": "tstl -p tsconfig.build.json",
+    "build": "run-s aeony-clean aeony-build",
+    "prettier": "prettier --check ./tests ./src",
+    "lint": "eslint ./tests ./src",
+    "clean-tests": "rimraf ./tests_out",
+    "build-tests": "pnpm clean-tests && tstl -p tsconfig.test.json",
+    "run-tests": "busted",
+    "run-tests:dev": "busted --run=devUnit",
+    "test": "run-s clean-tests build-tests run-tests",
+    "test:dev": "run-s clean-tests build-tests run-tests:dev"
+  },
+  "keywords": [],
+  "author": "Jurmerlo",
+  "license": "MIT",
+  "packageManager": "pnpm@10.10.0",
+  "devDependencies": {
+    "@aeony/eslint-config": "1.0.1",
+    "@aeony/prettier-config": "1.0.0",
+    "@typescript-to-lua/language-extensions": "^1.19.0",
+    "busted-tstl": "0.1.2-rc.0",
+    "eslint": "^9.26.0",
+    "love-typescript-definitions": "^11.5.0",
+    "lua-types": "^2.13.1",
+    "npm-run-all2": "^8.0.1",
+    "prettier": "^3.5.3",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.3",
+    "typescript-to-lua": "^1.31.0"
+  }
+}

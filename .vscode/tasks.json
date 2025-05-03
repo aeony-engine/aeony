@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "build",
+      "group": {
+        "kind": "build",
+      },
+      "label": "Build Aeony"
+    },
+    {
+      "type": "shell",
+      "command": "aeony",
+      "args": ["run", "-c", "-p", "${workspaceFolder}/${input:gamePath}"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "label": "Build and Run Test Game",
+      "dependsOn": "Build Aeony",
+    },
+    {
+      "type": "shell",
+      "command": "aeony",
+      "args": ["build", "-c", "-p", "${workspaceFolder}/${input:gamePath}"],
+      "group": "build",
+      "problemMatcher": [],
+      "label": "Build Test Game",
+      "dependsOn": "Build Aeony",
+    }
+  ],
+  "inputs": [
+    {
+      "id": "gamePath",
+      "type": "pickString",
+      "description": "Select the game path to build",
+      "options": [
+        "tests/games/basic",
+      ]
+    }
+  ]
+}

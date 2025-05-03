@@ -1,0 +1,5 @@
+dist/
+node_modules/
+tests_out/
+.DS_Store
+export/

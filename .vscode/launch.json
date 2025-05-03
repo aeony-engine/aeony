@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lua-local",
+      "request": "launch",
+      "name": "Debug Love",
+      "program": {
+        "command": "love"
+      },
+      "args": ["export"],
+      "scriptRoots": ["export"],
+      "scriptFiles": ["export/**/*.lua"],
+      "cwd": "${workspaceFolder}/${input:gamePath}",
+      "preLaunchTask": "Build Test Game"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "gamePath",
+      "type": "pickString",
+      "description": "Select the game path to build",
+      "options": [
+        "tests/games/basic",
+      ]
+    }
+  ]
+}
