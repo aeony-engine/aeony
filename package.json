@@ -10,17 +10,21 @@
   "main": "./dist/index",
   "scripts": {
     "prepare": "tstl -p tsconfig.build.json",
+
+    "prettier": "prettier --check ./tests/unit ./src",
+    "lint": "eslint ./tests/unit ./src",
+
     "aeony-clean": "rimraf ./dist",
     "aeony-build": "tstl -p tsconfig.build.json",
     "build": "run-s aeony-clean aeony-build",
-    "prettier": "prettier --check ./tests/unit ./src",
-    "lint": "eslint ./tests/unit ./src",
+
     "tests-clean": "rimraf ./tests_out",
     "tests-build": "tstl -p tsconfig.test.json",
     "build-tests": "run-s tests-clean tests-build",
     "run-tests": "busted",
-    "run-tests:dev": "busted --run=devUnit",
     "test": "run-s clean-tests build-tests run-tests",
+
+    "run-tests:dev": "busted --run=devUnit",
     "test:dev": "run-s clean-tests build-tests run-tests:dev"
   },
   "keywords": [],
