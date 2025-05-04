@@ -6,7 +6,7 @@ on:
     branches:
       - main
 jobs:
-  lint-build-and-test:
+  lint-build-and-test-ae0ny:
     name: 'lint, build and test aeony'
     runs-on: ubuntu-latest
     steps:
@@ -40,3 +40,27 @@ jobs:
         uses: lunarmodules/busted@v2.2.0
         with:
           args: tests_out --pattern="%.test%." --lpath="tests_out/?.lua"
+  
+  build-test-games:
+    name: 'build test games'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        game: [basic]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.10.0
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build ${{ matrix.game }} game
+        run: npx tstl -p tests/games/${{ matrix.game }}/tsconfig.json
