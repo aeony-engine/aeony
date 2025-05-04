@@ -1,0 +1,13 @@
+{
+  "extends":"../../../tsconfig.json",
+  "include": ["../../src", "src"],
+  "compilerOptions": {
+    "declaration": false,
+    "outDir": "export"
+  },
+  "tstl": {
+    "luaBundleEntry": "src/main.ts",
+    "luaBundle": "main.lua",
+    "buildMode": "default"
+  }
+}

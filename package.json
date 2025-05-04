@@ -11,8 +11,8 @@
   "scripts": {
     "prepare": "tstl -p tsconfig.build.json",
 
-    "prettier": "prettier --check ./tests/unit ./src",
-    "lint": "eslint ./tests/unit ./src",
+    "prettier": "prettier --check ./tests/**/*.ts ./src/**/*.ts",
+    "lint": "eslint ./tests/unit ./src/**/*.ts",
 
     "aeony-clean": "rimraf ./dist",
     "aeony-build": "tstl -p tsconfig.build.json",
