@@ -93,11 +93,35 @@ export class Scenes {
     }
   }
 
+  toForeground(): void {
+    if (this.current) {
+      this.current.toForeground();
+    }
+  }
+
+  toBackground(): void {
+    if (this.current) {
+      this.current.toBackground();
+    }
+  }
+
+  resize(width: number, height: number): void {
+    if (this.current) {
+      this.current.resize(width, height);
+    }
+  }
+
   private updateStack(): void {
     if (this.sceneTypeToSwitch) {
       const { type, sceneType } = this.sceneTypeToSwitch;
 
       if (type === 'pop') {
+        if (this.sceneStack.length <= 1) {
+          print('Cannot pop the last scene from the stack.');
+          this.sceneTypeToSwitch = undefined;
+          return;
+        }
+
         const scene = this.sceneStack.pop();
         if (scene) {
           scene.destroy();

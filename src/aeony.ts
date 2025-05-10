@@ -2,9 +2,12 @@ import { LightUserData } from 'love';
 import { GamepadAxis, GamepadButton, Joystick, JoystickHat } from 'love.joystick';
 import { KeyConstant } from 'love.keyboard';
 
+import { Debug } from './debug';
 import { Services } from './di';
 import { Input } from './input/input';
-import { Scenes, SceneType } from './scenes';
+import { Scenes, SceneType } from './scenes/scenes';
+import { Time } from './utils/time';
+import { View } from './view';
 
 type HandlerKey = keyof typeof love.handlers;
 
@@ -14,31 +17,56 @@ type HandlerKey = keyof typeof love.handlers;
  */
 class AeonyInternal {
   static started = false;
+
   static input: Input;
 
   static scenes: Scenes;
 
-  static init(startScene: SceneType): void {
+  static time: Time;
+
+  static view: View;
+
+  static debug: Debug;
+
+  static start(designWidth: number, designHeight: number, startScene: SceneType): void {
     Services.clear();
     AeonyInternal.input = new Input();
     Services.add(Input, AeonyInternal.input);
 
     AeonyInternal.scenes = new Scenes();
     Services.add(Scenes, AeonyInternal.scenes);
+
+    AeonyInternal.time = new Time();
+    Services.add(Time, AeonyInternal.time);
+
+    AeonyInternal.view = new View(designWidth, designHeight);
+    Services.add(View, AeonyInternal.view);
+
     AeonyInternal.scenes.switch('push', startScene);
+
+    AeonyInternal.debug = new Debug();
 
     AeonyInternal.started = true;
   }
 
   static update(dt: number): void {
+    AeonyInternal.time.update(dt);
+
+    const delta = AeonyInternal.time.dt;
     const scenes = AeonyInternal.scenes;
-    scenes.preUpdate(dt);
-    scenes.update(dt);
-    scenes.postUpdate(dt);
+
+    scenes.preUpdate(delta);
+    scenes.update(delta);
+    scenes.postUpdate(delta);
   }
 
   static draw(): void {
+    AeonyInternal.view.activateCanvas();
     AeonyInternal.scenes.draw();
+    AeonyInternal.view.drawCanvas();
+
+    AeonyInternal.debug.draw();
+
     love.graphics.present();
   }
 }
@@ -47,8 +75,8 @@ class AeonyInternal {
  * @noSelf
  */
 export class Aeony {
-  static init(startScene: SceneType): void {
-    AeonyInternal.init(startScene);
+  static start(width: number, height: number, startScene: SceneType): void {
+    AeonyInternal.start(width, height, startScene);
   }
 }
 
@@ -82,14 +110,15 @@ love.run = (): (() => number | null) => {
     }
 
     if (AeonyInternal.started) {
-      // Debug.update();
+      const debug = AeonyInternal.debug;
+      debug.update();
 
-      // if (!Debug.isPaused) {
-      AeonyInternal.update(dt);
-      // } else if (Debug.runFrame) {
-      // Debug.runFrame = false;
-      // Game.update(dt);
-      // }
+      if (!debug.isPaused) {
+        AeonyInternal.update(dt);
+      } else if (debug.isPaused) {
+        debug.runFrame = true;
+        AeonyInternal.update(dt);
+      }
       AeonyInternal.draw();
     }
 
@@ -99,6 +128,23 @@ love.run = (): (() => number | null) => {
 
     return null;
   };
+};
+
+love.handlers.focus = (hasFocus: boolean): void => {
+  if (AeonyInternal.started) {
+    if (hasFocus) {
+      AeonyInternal.scenes.toForeground();
+    } else {
+      AeonyInternal.scenes.toBackground();
+    }
+  }
+};
+
+love.handlers.resize = (width: number, height: number): void => {
+  if (AeonyInternal.started) {
+    AeonyInternal.view.scaleToWindow();
+    AeonyInternal.scenes.resize(width, height);
+  }
 };
 
 love.keypressed = (key: KeyConstant, scancode: string, isRepeated: boolean): void => {

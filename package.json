@@ -10,20 +10,18 @@
   "main": "./dist/index",
   "scripts": {
     "prepare": "tstl -p tsconfig.build.json",
-
     "prettier": "prettier --check ./tests/**/*.ts ./src/**/*.ts",
     "lint": "eslint ./tests/unit ./src/**/*.ts",
-
     "aeony-clean": "rimraf ./dist",
     "aeony-build": "tstl -p tsconfig.build.json",
-    "build": "run-s aeony-clean aeony-build",
-
+    "copy-lua": "copyfiles -u 1 src/**/*.lua dist",
+    "copy-luda-dts-types": "copyfiles -u 1 src/**/*.d.ts dist",
+    "build": "run-s aeony-clean aeony-build copy-lua copy-luda-dts-types",
     "tests-clean": "rimraf ./tests_out",
     "tests-build": "tstl -p tsconfig.test.json",
     "build-tests": "run-s tests-clean tests-build",
     "run-tests": "busted",
     "test": "run-s clean-tests build-tests run-tests",
-
     "run-tests:dev": "busted --run=devUnit",
     "test:dev": "run-s clean-tests build-tests run-tests:dev"
   },
@@ -36,6 +34,7 @@
     "@aeony/prettier-config": "1.0.0",
     "@typescript-to-lua/language-extensions": "^1.19.0",
     "busted-tstl": "0.1.2-rc.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^9.26.0",
     "love-typescript-definitions": "^11.5.0",
     "lua-types": "^2.13.1",
