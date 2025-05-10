@@ -6,4 +6,4 @@ class TestScene extends Scene {
   }
 }
 
-Aeony.init(TestScene);
+Aeony.start(800, 600, TestScene);
