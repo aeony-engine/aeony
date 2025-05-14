@@ -90,8 +90,8 @@ export class Aeony {
   }
 }
 
-function shouldHotReload(lastModified?: number): number | undefined {
-  const file = love.filesystem.getInfo('hotReload.dat');
+function shouldLiveReload(lastModified?: number): number | undefined {
+  const file = love.filesystem.getInfo('liveReload.dat');
   if (file) {
     if (lastModified !== file.modtime) {
       return file.modtime;
@@ -108,7 +108,7 @@ love.run = (): (() => number | null) => {
 
   let dt = 0;
 
-  let hotReloadModified: number | undefined;
+  let liveReloadModified: number | undefined;
 
   return (): number | null => {
     if (love.event !== undefined) {
@@ -133,13 +133,13 @@ love.run = (): (() => number | null) => {
 
     if (AeonyInternal.started) {
       // Hot reloading
-      const modifiedTime = shouldHotReload(hotReloadModified);
+      const modifiedTime = shouldLiveReload(liveReloadModified);
       if (modifiedTime) {
-        if (hotReloadModified) {
+        if (liveReloadModified) {
           print('Files changed, reloading...');
           love.event.quit('restart');
         }
-        hotReloadModified = modifiedTime;
+        liveReloadModified = modifiedTime;
       }
 
       const debugView = AeonyInternal.debugView;
