@@ -2,7 +2,7 @@ import { LightUserData } from 'love';
 import { GamepadAxis, GamepadButton, Joystick, JoystickHat } from 'love.joystick';
 import { KeyConstant } from 'love.keyboard';
 
-import { Debug } from './debug';
+import { DebugView } from './debug';
 import { Services } from './di';
 import { Input } from './input/input';
 import { Scenes, SceneType } from './scenes/scenes';
@@ -10,6 +10,15 @@ import { Time } from './utils/time';
 import { View } from './view';
 
 type HandlerKey = keyof typeof love.handlers;
+
+const MAX_DT = 0.033; // 30 FPS
+
+export type AeonyOptions = {
+  designWidth: number;
+  designHeight: number;
+  startScene: SceneType;
+  debugView?: boolean;
+};
 
 /**
  * Internal class to manage the game loop and input events, without exposing it to the global scope.
@@ -26,9 +35,9 @@ class AeonyInternal {
 
   static view: View;
 
-  static debug: Debug;
+  static debugView: DebugView;
 
-  static start(designWidth: number, designHeight: number, startScene: SceneType): void {
+  static start({ designWidth, designHeight, startScene, debugView }: AeonyOptions): void {
     Services.clear();
     AeonyInternal.input = new Input();
     Services.add(Input, AeonyInternal.input);
@@ -44,7 +53,8 @@ class AeonyInternal {
 
     AeonyInternal.scenes.switch('push', startScene);
 
-    AeonyInternal.debug = new Debug();
+    AeonyInternal.debugView = new DebugView(debugView ?? false);
+    Services.add(DebugView, AeonyInternal.debugView);
 
     AeonyInternal.started = true;
   }
@@ -65,7 +75,7 @@ class AeonyInternal {
     AeonyInternal.scenes.draw();
     AeonyInternal.view.drawCanvas();
 
-    AeonyInternal.debug.draw();
+    AeonyInternal.debugView.draw();
 
     love.graphics.present();
   }
@@ -75,9 +85,20 @@ class AeonyInternal {
  * @noSelf
  */
 export class Aeony {
-  static start(width: number, height: number, startScene: SceneType): void {
-    AeonyInternal.start(width, height, startScene);
+  constructor(options: AeonyOptions) {
+    AeonyInternal.start(options);
   }
+}
+
+function shouldHotReload(lastModified?: number): number | undefined {
+  const file = love.filesystem.getInfo('hotReload.dat');
+  if (file) {
+    if (lastModified !== file.modtime) {
+      return file.modtime;
+    }
+  }
+
+  return undefined;
 }
 
 love.run = (): (() => number | null) => {
@@ -86,6 +107,8 @@ love.run = (): (() => number | null) => {
   }
 
   let dt = 0;
+
+  let hotReloadModified: number | undefined;
 
   return (): number | null => {
     if (love.event !== undefined) {
@@ -105,20 +128,34 @@ love.run = (): (() => number | null) => {
     }
 
     if (love.timer !== undefined) {
-      // dt = math.min(love.timer.step(), MAX_DT);
-      dt = love.timer.step();
+      dt = math.min(love.timer.step(), MAX_DT);
     }
 
     if (AeonyInternal.started) {
-      const debug = AeonyInternal.debug;
-      debug.update();
+      // Hot reloading
+      const modifiedTime = shouldHotReload(hotReloadModified);
+      if (modifiedTime) {
+        if (hotReloadModified) {
+          print('Files changed, reloading...');
+          love.event.quit('restart');
+        }
+        hotReloadModified = modifiedTime;
+      }
 
-      if (!debug.isPaused) {
-        AeonyInternal.update(dt);
-      } else if (debug.isPaused) {
-        debug.runFrame = true;
+      const debugView = AeonyInternal.debugView;
+      debugView.update();
+
+      if (debugView.visible) {
+        if (!debugView.isPaused) {
+          AeonyInternal.update(dt);
+        } else if (debugView.runFrame) {
+          debugView.runFrame = false;
+          AeonyInternal.update(dt);
+        }
+      } else {
         AeonyInternal.update(dt);
       }
+
       AeonyInternal.draw();
     }
 

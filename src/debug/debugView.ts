@@ -1,11 +1,17 @@
 /**
  * Debug functions.
  */
-export class Debug {
+export class DebugView {
   /**
    * Indicates if debug information should be shown.
    */
-  showDebugInfo = false;
+  get visible(): boolean {
+    return this.viewEnabled && this.isVisible;
+  }
+
+  set visible(value: boolean) {
+    this.isVisible = value;
+  }
 
   /**
    * Indicates if the game is paused.
@@ -13,6 +19,10 @@ export class Debug {
   get isPaused(): boolean {
     return this.paused;
   }
+
+  private isVisible = true;
+
+  private viewEnabled: boolean;
 
   /**
    * Track the paused state.
@@ -28,11 +38,15 @@ export class Debug {
 
   private mouseWasDown = false;
 
+  constructor(viewEnabled: boolean) {
+    this.viewEnabled = viewEnabled;
+  }
+
   /**
    * Updates the debug state.
    */
   update(): void {
-    if (this.showDebugInfo) {
+    if (this.visible) {
       if (love.mouse.isDown(1) && !this.mouseWasDown) {
         this.mouseWasDown = true;
       } else if (!love.mouse.isDown(1) && this.mouseWasDown) {
@@ -67,7 +81,7 @@ export class Debug {
    * Draws the debug information.
    */
   draw(): void {
-    if (this.showDebugInfo) {
+    if (this.visible) {
       const stats = love.graphics.getStats();
       const fps = love.timer.getFPS();
 
