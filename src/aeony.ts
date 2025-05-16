@@ -136,7 +136,7 @@ love.run = (): (() => number | null) => {
       const modifiedTime = shouldLiveReload(liveReloadModified);
       if (modifiedTime) {
         if (liveReloadModified) {
-          print('Files changed, reloading...');
+          console.log('Files changed, reloading...');
           love.event.quit('restart');
         }
         liveReloadModified = modifiedTime;
