@@ -2,7 +2,7 @@ import { Aeony, Scene } from '../../../../src';
 
 class TestScene extends Scene {
   override update(dt: number): void {
-    console.log('update', dt);
+    print('update', dt);
   }
 }
 
