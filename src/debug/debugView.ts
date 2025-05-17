@@ -6,7 +6,7 @@ export class DebugView {
    * Indicates if debug information should be shown.
    */
   get visible(): boolean {
-    return this.viewEnabled && this.isVisible;
+    return this.debugEnabled && this.isVisible;
   }
 
   set visible(value: boolean) {
@@ -20,9 +20,9 @@ export class DebugView {
     return this.paused;
   }
 
-  private isVisible = true;
+  private isVisible = false;
 
-  private viewEnabled: boolean;
+  private debugEnabled: boolean;
 
   /**
    * Track the paused state.
@@ -38,8 +38,8 @@ export class DebugView {
 
   private mouseWasDown = false;
 
-  constructor(viewEnabled: boolean) {
-    this.viewEnabled = viewEnabled;
+  constructor(debugEnabled: boolean) {
+    this.debugEnabled = debugEnabled;
   }
 
   /**

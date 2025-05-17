@@ -117,7 +117,7 @@ export class Scenes {
 
       if (type === 'pop') {
         if (this.sceneStack.length <= 1) {
-          console.log('Cannot pop the last scene from the stack.');
+          print('Cannot pop the last scene from the stack.');
           this.sceneTypeToSwitch = undefined;
           return;
         }

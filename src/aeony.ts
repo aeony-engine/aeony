@@ -13,11 +13,13 @@ type HandlerKey = keyof typeof love.handlers;
 
 const MAX_DT = 0.033; // 30 FPS
 
+const LIVE_RELOAD_INTERVAL = 2;
+
 export type AeonyOptions = {
   designWidth: number;
   designHeight: number;
   startScene: SceneType;
-  debugView?: boolean;
+  debug?: boolean;
 };
 
 /**
@@ -37,7 +39,11 @@ class AeonyInternal {
 
   static debugView: DebugView;
 
-  static start({ designWidth, designHeight, startScene, debugView }: AeonyOptions): void {
+  static debugEnabled: boolean;
+
+  static start({ designWidth, designHeight, startScene, debug }: AeonyOptions): void {
+    AeonyInternal.debugEnabled = debug ?? false;
+
     Services.clear();
     AeonyInternal.input = new Input();
     Services.add(Input, AeonyInternal.input);
@@ -53,7 +59,7 @@ class AeonyInternal {
 
     AeonyInternal.scenes.switch('push', startScene);
 
-    AeonyInternal.debugView = new DebugView(debugView ?? false);
+    AeonyInternal.debugView = new DebugView(AeonyInternal.debugEnabled);
     Services.add(DebugView, AeonyInternal.debugView);
 
     AeonyInternal.started = true;
@@ -110,6 +116,8 @@ love.run = (): (() => number | null) => {
 
   let liveReloadModified: number | undefined;
 
+  let timeSinceLastReload = 0;
+
   return (): number | null => {
     if (love.event !== undefined) {
       love.event.pump();
@@ -132,14 +140,22 @@ love.run = (): (() => number | null) => {
     }
 
     if (AeonyInternal.started) {
-      // Hot reloading
-      const modifiedTime = shouldLiveReload(liveReloadModified);
-      if (modifiedTime) {
-        if (liveReloadModified) {
-          console.log('Files changed, reloading...');
-          love.event.quit('restart');
+      if (AeonyInternal.debugEnabled) {
+        // Live reloading
+
+        if (timeSinceLastReload < LIVE_RELOAD_INTERVAL) {
+          timeSinceLastReload += dt;
+        } else {
+          timeSinceLastReload = 0;
+          const modifiedTime = shouldLiveReload(liveReloadModified);
+          if (modifiedTime) {
+            if (liveReloadModified) {
+              print('Files changed, reloading...');
+              love.event.quit('restart');
+            }
+            liveReloadModified = modifiedTime;
+          }
         }
-        liveReloadModified = modifiedTime;
       }
 
       const debugView = AeonyInternal.debugView;

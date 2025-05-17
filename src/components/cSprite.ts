@@ -86,7 +86,7 @@ export class CSprite {
     this.frame = this.atlas.getFrame(frameName);
 
     if (!this.frame) {
-      console.log(`frame ${frameName} not found in atlas`);
+      print(`frame ${frameName} not found in atlas`);
     }
   }
 
